@@ -1,5 +1,6 @@
 package service.impl;
 
+import designPattern.CustomerBuilder;
 import model.Account;
 import model.Customer;
 import model.CustomerAccount;
@@ -33,11 +34,15 @@ public class CustomerServiceImpl implements CustomerService {
         String surname=InputUtil.requiredInputString("Enter the surname: ");
         String phone =InputUtil.requiredInputString("Enter the phone: ");
 
-        return new Customer(name,surname,phone);
+        return new CustomerBuilder()
+                .withCust_name(name)
+                .withCust_surname(surname)
+                .withPhone(phone)
+                .build();
     }
 
     @Override
-    public void createAccount() {
+    public void createAccount(){
         int custId= InputUtil.requiredInputInt("Enter the customer id: ");
         if (checkId(custId)){
             customerRepository.createAccount(fillAccount(custId));
@@ -60,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
             return false;
         }
     }
-    private Account fillAccount(int custId) {
+    private Account fillAccount(int custId){
         Random random=new Random();
         long cardNumber = 100000000L + (long)(random.nextDouble() * 900000000L);
         String accountNumber=String.valueOf(cardNumber);
@@ -99,9 +104,13 @@ public class CustomerServiceImpl implements CustomerService {
         String accountNumber=InputUtil.requiredInputString("Enter the card number: ");
         if (checkAccount(accountNumber)){
             int money=InputUtil.requiredInputInt("Depozit amount: ");
-            customerRepository.deposit(money,accountNumber);
-            addTransaction(accountNumber,"Depozit",money);
-            System.out.println("---------|Deposit is successfully|---------");
+            if (money > 0) {
+                customerRepository.deposit(money,accountNumber);
+                addTransaction(accountNumber,"Depozit",money);
+                System.out.println("---------|Deposit is successfully|---------");
+            }else {
+                System.out.println("Money cannot be negative");
+            }
         }else {
             System.out.println("There is no such account");
         }
@@ -112,17 +121,21 @@ public class CustomerServiceImpl implements CustomerService {
         String accountNumber=InputUtil.requiredInputString("Enter the card number: ");
         if (checkAccount(accountNumber)){
             int money=InputUtil.requiredInputInt("Spend amount: ");
-            //money'in balansdan boyuk olmamasini yoxlayiram
-            CustomerAccount customerAccount = showAccounts().stream()
-                    .filter(i -> i.getAccount_number().equals(accountNumber) && i.getBalance() > money)
-                    .findFirst()
-                    .orElse(null);
-            if (customerAccount!=null){
-                customerRepository.takeMoney(money,accountNumber);
-                addTransaction(accountNumber,"Spend",money);
-                System.out.println("---------|Spend is successfully|---------");
+            if (money>0){
+                //money'in balansdan boyuk olmamasini yoxlayiram
+                CustomerAccount customerAccount = showAccounts().stream()
+                        .filter(i -> i.getAccount_number().equals(accountNumber) && i.getBalance() > money)
+                        .findFirst()
+                        .orElse(null);
+                if (customerAccount!=null){
+                    customerRepository.takeMoney(money,accountNumber);
+                    addTransaction(accountNumber,"Spend",money);
+                    System.out.println("---------|Spend is successfully|---------");
+                }else {
+                    System.out.println("---------|There is no such amount in the account|---------");
+                }
             }else {
-                System.out.println("---------|There is no such amount in the account|---------");
+                System.out.println("Money cannot be negative");
             }
         }else {
             System.out.println("There is no such account");
@@ -136,17 +149,21 @@ public class CustomerServiceImpl implements CustomerService {
             String accountNumber2=InputUtil.requiredInputString("Enter the card number to be transferred: ");
             if (checkAccount(accountNumber2)){
                 int money=InputUtil.requiredInputInt("Transfer amount: ");
-                //money'in balansdan boyuk olmamasini yoxlayiram
-                CustomerAccount customerAccount = showAccounts().stream()
-                        .filter(i -> i.getAccount_number().equals(accountNumber1) && i.getBalance() > money)
-                        .findFirst()
-                        .orElse(null);
-                if (customerAccount!=null){
-                    customerRepository.moneyTransfer(money,accountNumber1,accountNumber2);
-                    addTransaction(accountNumber1,"Transfer",money);
-                    System.out.println("---------|Transfer is successfully|---------");
+                if (money>0){
+                    //money'in balansdan boyuk olmamasini yoxlayiram
+                    CustomerAccount customerAccount = showAccounts().stream()
+                            .filter(i -> i.getAccount_number().equals(accountNumber1) && i.getBalance() > money)
+                            .findFirst()
+                            .orElse(null);
+                    if (customerAccount!=null){
+                        customerRepository.moneyTransfer(money,accountNumber1,accountNumber2);
+                        addTransaction(accountNumber1,"Transfer",money);
+                        System.out.println("---------|Transfer is successfully|---------");
+                    }else {
+                        System.out.println("---------|There is no such amount in the account|---------");
+                    }
                 }else {
-                    System.out.println("---------|There is no such amount in the account|---------");
+                    System.out.println("Money cannot be negative");
                 }
             }else {
                 System.out.println("There is no such account");

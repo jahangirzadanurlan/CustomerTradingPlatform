@@ -6,17 +6,16 @@ import model.CustomerAccount;
 import model.Transaction;
 import queries.customerQuery;
 import repository.CustomerRepository;
+import repository.DBConnection;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-import static repository.DBConnection.connect;
-
 public class CustomerRepositoryImpl implements CustomerRepository {
     @Override
     public boolean createCustomer(Customer customer) {
-        try(Connection connection=connect()){
+        try(Connection connection= DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.CREATE_CUSTOMER);
             preparedStatement.setString(1,customer.getCust_name());
             preparedStatement.setString(2,customer.getCust_surname());
@@ -33,7 +32,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public boolean createAccount(Account account) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.CREATE_ACCOUNT);
             preparedStatement.setInt(1,account.getCustId());
             preparedStatement.setString(2,account.getAccountNumber());
@@ -50,7 +49,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public boolean addTransaction(Transaction transaction) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.ADD_TRANSACTION);
             preparedStatement.setString(1,transaction.getAccount_id());
             preparedStatement.setDate(2, Date.valueOf(transaction.getDate()));
@@ -68,7 +67,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public boolean deposit(double money,String accountNumber) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.DEPOSIT);
             preparedStatement.setDouble(1,money);
             preparedStatement.setString(2,accountNumber);
@@ -84,7 +83,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public boolean takeMoney(double money, String accountNumber) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.TAKE_MONEY);
             preparedStatement.setDouble(1,money);
             preparedStatement.setString(2,accountNumber);
@@ -100,7 +99,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public boolean moneyTransfer(double money, String accountNumber1, String accountNumber2) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.MONEY_TRANSFER);
             preparedStatement.setDouble(1,money);
             preparedStatement.setString(2,accountNumber1);
@@ -118,7 +117,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public boolean deleteAccount(String accountNumber) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.DELETE_ACCOUNT);
             preparedStatement.setString(1,accountNumber);
 
@@ -133,7 +132,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public List<Transaction> transactionHistories(String accountNumber) {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.TRANSACTION_HISTORIES);
             preparedStatement.setString(1,accountNumber);
 
@@ -156,7 +155,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public List<CustomerAccount> showAccounts() {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.SHOW_ACCOUNTS);
 
             List<CustomerAccount> customers=new LinkedList<>();
@@ -181,7 +180,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public List<Customer> showCustomers() {
-        try(Connection connection=connect()){
+        try(Connection connection=DBConnection.getInstance().getConnection()){
             PreparedStatement preparedStatement=connection.prepareStatement(customerQuery.SHOW_CUSTOMERS);
 
             List<Customer> customers=new LinkedList<>();

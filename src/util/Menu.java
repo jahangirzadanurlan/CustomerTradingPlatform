@@ -32,7 +32,7 @@ public class Menu {
         return InputUtil.requiredInputInt("Choose option: ");
     }
 
-    public static void start() {
+    public static void start(){
         CustomerServiceImpl customerService = new CustomerServiceImpl();
         while (true) {
             int choose = homePage();

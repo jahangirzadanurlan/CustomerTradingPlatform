@@ -1,5 +1,6 @@
 package service;
 
+import exception.MyException;
 import model.Account;
 import model.Customer;
 import model.CustomerAccount;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface CustomerService {
     void createCustomer();
-    void createAccount();
+    void createAccount() throws MyException;
     void addTransaction(String accountId,String type,double amount);
     void deposit();
     void takeMoney();
